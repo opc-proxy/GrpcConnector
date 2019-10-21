@@ -27,7 +27,7 @@ using NLog;
 
 namespace OpcGrpcConnect
 {
-    class HttpImpl : Http.HttpBase, IOPCconnect
+    public class HttpImpl : Http.HttpBase, IOPCconnect
     {
 
         private serviceManager _services;
