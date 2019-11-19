@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using System.Threading;
 using Grpc.Core;
 using OpcGrpcConnect;
 using System.Collections.Generic;
@@ -97,7 +98,7 @@ namespace OpcGrpcConnect
         /// Initialization. Everything that needs to be done for initializzation will be passed here.
         /// </summary>
         /// <param name="config">JSON configuration see Newtonsoft.Json for how to parse an object out of it</param>
-        public void init(JObject config){
+        public void init(JObject config, CancellationTokenSource cts){
             const int Port = 50051;
             server = new Server
             {
@@ -108,8 +109,12 @@ namespace OpcGrpcConnect
             server.Start();
 
             logger.Info("Listening on port 50051 ...");
-            //server.ShutdownAsync().Wait();
 
+        }
+
+        public  void clean(){
+            server.ShutdownAsync().Wait();
+            logger.Debug("HTTP GRPC server is down");
         }
 
     }
