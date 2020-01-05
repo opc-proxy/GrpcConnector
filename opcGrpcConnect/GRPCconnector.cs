@@ -99,16 +99,17 @@ namespace OpcGrpcConnect
         /// </summary>
         /// <param name="config">JSON configuration see Newtonsoft.Json for how to parse an object out of it</param>
         public void init(JObject config, CancellationTokenSource cts){
-            const int Port = 50051;
+            grpcConf conf = config.ToObject<grpcConfWrapper>().gRPC;
+
             server = new Server
             {
                 Services = { Http.BindService(this) },
-                Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
+                Ports = { new ServerPort(conf.host, conf.port, ServerCredentials.Insecure) }
             };
             
             server.Start();
 
-            logger.Info("Listening on port 50051 ...");
+            logger.Info("Listening on:  "+ conf.host + ":" + conf.port.ToString());
 
         }
 
@@ -117,6 +118,24 @@ namespace OpcGrpcConnect
             logger.Debug("HTTP GRPC server is down");
         }
 
+    }
+
+    public class grpcConfWrapper{
+        public grpcConf gRPC {get;set;}
+
+        public grpcConfWrapper(){
+            gRPC = new grpcConf();
+        }
+    }
+
+    public class grpcConf{
+        public string host {get;set;}
+        public int port {get; set;}
+
+        public grpcConf(){
+            host = "localhost";
+            port = 5051;
+        }
     }
 
 }
