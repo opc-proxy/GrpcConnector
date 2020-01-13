@@ -22,3 +22,10 @@ any language.
 
 You find full documentation of the OPC-Proxy project at: [opc-proxy.readthedocs.io](https://opc-proxy.readthedocs.io/en/latest/) 
 
+
+# Add it to your project with nuGet
+
+```bash
+dotnet add package opcProxy.GrpcConnector 
+```
+
