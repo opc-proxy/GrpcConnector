@@ -28,4 +28,9 @@ You find full documentation of the OPC-Proxy project at: [opc-proxy.readthedocs.
 ```bash
 dotnet add package opcProxy.GrpcConnector 
 ```
+# NodeJS Client Example
+
+A minimal example client for NodeJS that implements a communication with this OPC-Proxy Connector
+can be found [here](https://github.com/opc-proxy/OPC-Node-Client-Examples/tree/master/Examples/gRPC).
+
 
