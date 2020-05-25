@@ -15,11 +15,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="NLog" Version="4.6.7" />
-    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua" Version="1.4.357.28" />
-    <PackageReference Include="opcProxy.core" Version="0.1.4" />
-    <!-- <PackageReference Include="opcProxy.core" Version="0.1.1" /> -->
+    <PackageReference Include="opcProxy.core" Version="0.2.1" />
   </ItemGroup>
 
   <ItemGroup>

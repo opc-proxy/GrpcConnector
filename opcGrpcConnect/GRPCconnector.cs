@@ -37,7 +37,7 @@ namespace OpcGrpcConnect
 
 
         // Server side handler of the SayHello RPC
-        public override Task<ReadResponse> ReadOpcNodes(ReadRequest request, ServerCallContext context)
+        public async override Task<ReadResponse> ReadOpcNodes(ReadRequest request, ServerCallContext context)
         {
             List<string> names = new List<string>{};
 
@@ -45,11 +45,13 @@ namespace OpcGrpcConnect
                 names.Add(name);
             }
             ReadStatusCode status;
-            var values =  _services.readValueFromCache(names.ToArray(),out status);
+            var values =  await _services.readValueFromCache(names.ToArray());
 
             ReadResponse r = new ReadResponse();
 
             foreach(var variable in values){
+                // FIX https://github.com/opc-proxy/opc-proxy-core/issues/21
+                
                 NodeValue val = new NodeValue();
                 val.Name = variable.name;
                 val.Type = variable.systemType;
