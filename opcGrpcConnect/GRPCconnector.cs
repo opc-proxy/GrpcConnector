@@ -16,11 +16,9 @@ using System;
 using System.Threading.Tasks;
 using System.Threading;
 using Grpc.Core;
-using OpcGrpcConnect;
 using System.Collections.Generic;
 
 using OpcProxyClient; 
-using Opc.Ua; 
 using OpcProxyCore;
 using Newtonsoft.Json.Linq;
 using NLog;
@@ -37,17 +35,18 @@ namespace OpcGrpcConnect
 
 
         // Server side handler of the SayHello RPC
-        public override Task<ReadResponse> ReadOpcNodes(ReadRequest request, ServerCallContext context)
+        public override Task<Response> ReadOpcNodes(ReadRequest request, ServerCallContext context)
         {
             List<string> names = new List<string>{};
 
             foreach( var name in request.Names){
                 names.Add(name);
             }
-            ReadStatusCode status;
-            var values =  _services.readValueFromCache(names.ToArray(),out status);
+            var temp = _services.readValueFromCache(names.ToArray());
+            temp.Wait();
+            var values = temp.Result;
 
-            ReadResponse r = new ReadResponse();
+            Response r = new Response();
 
             foreach(var variable in values){
                 NodeValue val = new NodeValue();
@@ -55,24 +54,39 @@ namespace OpcGrpcConnect
                 val.Type = variable.systemType;
                 val.Value = variable.value.ToString();
                 val.Timestamp = variable.timestamp.ToUniversalTime().ToString("o");
+                val.ErrorMessage = variable.statusCode.ToString();
+                val.IsError = !variable.success;
                 r.Nodes.Add(val);
             }
-            r.ErrorMessage = ( status == ReadStatusCode.Ok) ? "none" : "Error";
-            r.IsError = ( status != ReadStatusCode.Ok);
 
             return Task.FromResult( r );
         }
-        public async override Task<WriteResponse> WriteOpcNode (WriteRequest request, ServerCallContext context){
+        public override Task<Response> WriteOpcNode (WriteRequest request, ServerCallContext context){
             
-            StatusCodeCollection statuses = await _services.writeToOPCserver(request.Name, request.Value ) ;
+            List<string> names = new List<string>{};
+            List<object> values = new List<object>{};
 
-            WriteResponse r = new WriteResponse();
-            r.IsError = (Opc.Ua.StatusCode.IsBad(statuses[0]));
-            r.ErrorMessage = (r.IsError) ? "Error" : "none";
+            for( int k =0; k<request.Names.Count; k++){
+                names.Add(request.Names[k]);
+                values.Add(request.Values[k]);
+            }
+            var temp = _services.writeToOPCserver(names.ToArray(), values.ToArray() ) ;
+            temp.Wait();
+            var data = temp.Result;
+            Response r = new Response();
 
-            if(r.IsError) logger.Error("Error in writing");
-            else logger.Debug("Written value: " +  request.Value + "  on variable " + request.Name );
-            return r;
+            foreach(var variable in data){
+                NodeValue val = new NodeValue();
+                val.Name = variable.name;
+                val.Type = "";
+                val.Value = variable.value.ToString();
+                val.Timestamp = DateTime.Now.ToUniversalTime().ToString("o");
+                val.ErrorMessage = variable.statusCode.ToString();
+                val.IsError = !variable.success;
+                r.Nodes.Add(val);
+            }
+
+            return Task.FromResult( r );
         }
 
 

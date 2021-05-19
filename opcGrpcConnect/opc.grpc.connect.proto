@@ -19,9 +19,9 @@ package OpcGrpcConnect;
 
 service Http {
 
-  rpc ReadOpcNodes (ReadRequest) returns (ReadResponse) {}
+  rpc ReadOpcNodes (ReadRequest) returns (Response) {}
 
-  rpc WriteOpcNode (WriteRequest) returns (WriteResponse) {}
+  rpc WriteOpcNode (WriteRequest) returns (Response) {}
   
 }
 
@@ -31,19 +31,12 @@ message  ReadRequest {
 }
 
 message WriteRequest {
-  string name = 1;
-  string value = 2;
+  repeated string names = 1;
+  repeated string values = 2;
 }
 
-message  ReadResponse {
+message  Response {
   repeated NodeValue nodes = 1;
-  bool isError = 2;
-  string errorMessage = 3 ;
-}
-
-message WriteResponse {
-  bool isError = 1;
-  string errorMessage = 2 ;
 }
 
 message NodeValue {
@@ -51,5 +44,7 @@ message NodeValue {
   string value = 2 ;
   string timestamp = 3; // format ISO 8601 - UTC
   string type = 4;      // int, bool, float, string
+  bool isError = 5;
+  string errorMessage = 6 ;
 }
 
