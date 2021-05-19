@@ -49,6 +49,8 @@ namespace OpcGrpcConnect
             Response r = new Response();
 
             foreach(var variable in values){
+                // FIX https://github.com/opc-proxy/opc-proxy-core/issues/21
+                
                 NodeValue val = new NodeValue();
                 val.Name = variable.name;
                 val.Type = variable.systemType;
